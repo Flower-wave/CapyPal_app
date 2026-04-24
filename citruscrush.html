@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CapyPal — Citrus Crush</title>
+  <style>
+    :root {
+      --bg: #f8f1e6;
+      --frame: #fff7ef;
+      --surface: rgba(255, 255, 255, 0.95);
+      --text: #3b2a1e;
+      --muted: #7d6556;
+      --orange: #f7a531;
+      --orange-deep: #e48711;
+      --orange-soft: #fff1d8;
+      --leaf: #8abf63;
+      --line: #ff8d32;
+      --shadow: 0 18px 40px rgba(96, 65, 33, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      background: linear-gradient(180deg, #fbf3e8 0%, #f6e6d1 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 375px;
+    }
+
+    .app-frame {
+      width: 375px;
+      min-height: 812px;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(circle at top left, rgba(255, 231, 187, 0.9), transparent 38%),
+        radial-gradient(circle at bottom right, rgba(247, 165, 49, 0.24), transparent 34%),
+        var(--frame);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(180, 125, 66, 0.16);
+      overflow: hidden;
+    }
+
+    .header_home {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .app-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #fff;
+      padding: 4px;
+      box-shadow: 0 8px 18px rgba(64, 43, 17, 0.08);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .right {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--muted);
+      font-size: 15px;
+      box-shadow: 0 8px 18px rgba(64, 43, 17, 0.08);
+    }
+
+    .top-nav {
+      display: flex;
+      gap: 8px;
+      justify-content: space-around;
+      padding: 8px 12px 10px;
+      border-bottom: 1px solid rgba(125, 101, 86, 0.12);
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .nav-home {
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .home-main {
+      flex: 1;
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero-card,
+    .game-card {
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: 0 14px 30px rgba(96, 65, 33, 0.08);
+    }
+
+    .hero-card {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background:
+        radial-gradient(circle at top left, rgba(255, 214, 138, 0.55), transparent 40%),
+        rgba(255, 250, 244, 0.98);
+    }
+
+    .hero-copy {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--orange-soft);
+      color: #a8600d;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-title {
+      margin: 10px 0 6px;
+      font-size: 27px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .hero-title-image {
+      width: 100%;
+      max-width: 220px;
+      display: block;
+      margin: 10px 0 8px;
+    }
+
+    .hero-sub {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .hero-badge {
+      width: 88px;
+      height: 88px;
+      border-radius: 24px;
+      object-fit: contain;
+      background: linear-gradient(180deg, #fff3db 0%, #ffdca6 100%);
+      padding: 12px;
+      box-shadow: inset 0 0 0 1px rgba(228, 135, 17, 0.12);
+    }
+
+    .game-card {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status-chip {
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: #fff4df;
+      color: #9a5b10;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .game-area {
+      position: relative;
+      height: 410px;
+      overflow: hidden;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 50% 24%, rgba(255, 245, 212, 0.95) 0, rgba(255, 245, 212, 0.92) 110px, rgba(255, 255, 255, 0) 112px),
+        linear-gradient(180deg, #dff4ff 0%, #e9f9ff 56%, #fff8ed 56%, #fff0d7 100%);
+      border: 1px solid rgba(221, 173, 112, 0.28);
+    }
+
+    .game-label {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #a7600d;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      z-index: 2;
+      box-shadow: 0 10px 20px rgba(90, 63, 28, 0.08);
+    }
+
+    .game-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .outline-path {
+      fill: rgba(255, 183, 76, 0.12);
+      stroke: rgba(255, 153, 36, 0.18);
+      stroke-width: 5;
+    }
+
+    .drawn-line {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 6px 8px rgba(255, 141, 50, 0.22));
+    }
+
+    .dot {
+      fill: #fff;
+      stroke: var(--orange-deep);
+      stroke-width: 4;
+      cursor: pointer;
+      transition: transform 0.18s ease, fill 0.18s ease;
+    }
+
+    .dot:hover {
+      transform: scale(1.06);
+    }
+
+    .dot.completed {
+      fill: #ffc156;
+    }
+
+    .dot.current {
+      fill: #fff1b9;
+    }
+
+    .orange-leaf {
+      fill: #85bc5b;
+    }
+
+    .orange-stem {
+      stroke: #6d8b34;
+      stroke-width: 8;
+      stroke-linecap: round;
+    }
+
+    .ground-pill {
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .recording-status {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: #fff4df;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .audio-preview {
+      display: none;
+      width: 100%;
+      margin-top: 2px;
+    }
+
+    .audio-preview.show {
+      display: block;
+    }
+
+    .transcript-card {
+      display: none;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 20px;
+      background: #fff8ef;
+      border: 1px solid rgba(221, 173, 112, 0.24);
+    }
+
+    .transcript-card.show {
+      display: grid;
+    }
+
+    .transcript-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .transcript-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .transcript-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .transcript-editor {
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      border: 1px solid rgba(221, 173, 112, 0.28);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 16px;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 800;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--orange-deep);
+    }
+
+    .btn.secondary {
+      background: #fff3df;
+      color: #9a5b10;
+    }
+
+    .btn.more-games {
+      background: var(--orange);
+      color: #000;
+    }
+
+    .btn.more-games:hover {
+      background: var(--orange-deep);
+      color: #000;
+    }
+
+    .hint-card {
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: #fff8ef;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      border: 1px solid rgba(221, 173, 112, 0.24);
+    }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 10px;
+      }
+
+      .app-frame {
+        width: 100%;
+        min-height: auto;
+      }
+
+      .hero-card {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-badge {
+        width: 76px;
+        height: 76px;
+      }
+
+      .game-area {
+        height: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="app-frame">
+      <header class="header_home">
+        <div class="left">
+          <img src="CapyPal-Adhd-app_capy_icon.png" alt="CapyPal icon" class="app-icon">
+          <a href="games.html" class="title">Citrus Crush</a>
+        </div>
+        <div class="right">Profile</div>
+      </header>
+
+      <nav class="top-nav" aria-label="Main navigation">
+        <a href="home.html" class="nav-item nav-home">Home</a>
+        <a href="games.html" class="nav-item">Games</a>
+      </nav>
+
+      <main class="home-main">
+        <section class="hero-card">
+          <div class="hero-copy">
+            <div class="eyebrow">Focus Game</div>
+            <img src="citrus_crush_text.png" alt="Citrus Crush" class="hero-title-image">
+            <p class="hero-sub">Tap any dots to trace the orange in a calm, repetitive way.</p>
+          </div>
+        </section>
+
+        <section class="game-card">
+          <div class="status-row">
+            <div class="status-chip" id="progressChip">Free Trace</div>
+            <div class="status-text" id="statusText">Tap any dot to start tracing.</div>
+          </div>
+
+          <div class="game-area">
+            <div class="game-label">Trace the Orange</div>
+            <svg class="game-svg" viewBox="0 0 320 410" aria-label="Connect the dots citrus game">
+              <path class="outline-path" d="M160 98 C214 98 255 138 255 194 C255 266 207 320 160 320 C108 320 64 268 64 196 C64 138 107 98 160 98 Z"></path>
+              <path class="orange-stem" d="M160 92 L160 68"></path>
+              <path class="orange-leaf" d="M160 68 C188 46 217 47 228 74 C201 86 179 87 160 68 Z"></path>
+              <polyline class="drawn-line" id="drawnLine" points=""></polyline>
+              <circle class="dot" cx="160" cy="92" r="15"></circle>
+              <circle class="dot" cx="210" cy="132" r="15"></circle>
+              <circle class="dot" cx="232" cy="202" r="15"></circle>
+              <circle class="dot" cx="198" cy="282" r="15"></circle>
+              <circle class="dot" cx="122" cy="292" r="15"></circle>
+              <circle class="dot" cx="84" cy="224" r="15"></circle>
+              <circle class="dot" cx="95" cy="146" r="15"></circle>
+              <circle class="dot" cx="142" cy="106" r="15"></circle>
+            </svg>
+            <div class="ground-pill">Small repetitive motion, low-pressure focus</div>
+          </div>
+
+          <div class="controls">
+            <button class="btn primary" id="recordBtn" type="button">Start Recording</button>
+            <button class="btn primary" id="resetBtn" type="button">Reset</button>
+          </div>
+
+          <div class="recording-status" id="recordingStatus">Not recording</div>
+          <section class="transcript-card" id="transcriptCard">
+            <div class="transcript-head">
+              <div class="transcript-title">Transcript</div>
+              <div class="transcript-note" id="transcriptNote">Ready after recording</div>
+            </div>
+            <textarea id="transcriptEditor" class="transcript-editor" spellcheck="true"></textarea>
+          </section>
+          <a href="games.html" class="btn secondary more-games">More Games</a>
+          <audio id="audioPreview" class="audio-preview" controls></audio>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const dots = Array.from(document.querySelectorAll('.dot'));
+    const drawnLine = document.getElementById('drawnLine');
+    const progressChip = document.getElementById('progressChip');
+    const statusText = document.getElementById('statusText');
+    const recordBtn = document.getElementById('recordBtn');
+    const recordingStatus = document.getElementById('recordingStatus');
+    const transcriptCard = document.getElementById('transcriptCard');
+    const transcriptNote = document.getElementById('transcriptNote');
+    const transcriptEditor = document.getElementById('transcriptEditor');
+    const audioPreview = document.getElementById('audioPreview');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let points = [];
+    let tracedCount = 0;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let activeStream = null;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const transcriptSupported = Boolean(SpeechRecognition);
+    let recognition = null;
+    let transcriptFinal = '';
+
+    function setupRecognition() {
+      if (!transcriptSupported) return;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      recognition.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const result = event.results[i];
+          const text = result[0].transcript;
+          if (result.isFinal) {
+            transcriptFinal += `${text} `;
+          } else {
+            interim += text;
+          }
+        }
+        transcriptEditor.value = `${transcriptFinal}${interim}`.trim();
+      };
+      recognition.onerror = () => {
+        transcriptNote.textContent = 'Transcription paused. You can still edit notes below.';
+      };
+    }
+
+    function startTranscriptCapture() {
+      transcriptFinal = '';
+      transcriptEditor.value = '';
+      transcriptCard.classList.remove('show');
+      transcriptNote.textContent = transcriptSupported ? 'Listening for speech...' : 'Type notes after recording';
+      if (recognition) {
+        try {
+          recognition.start();
+        } catch (err) {
+          console.error('Speech recognition start error:', err);
+        }
+      }
+    }
+
+    function finishTranscriptCapture() {
+      if (recognition) {
+        try {
+          recognition.stop();
+        } catch (err) {
+          console.error('Speech recognition stop error:', err);
+        }
+      }
+      transcriptCard.classList.add('show');
+      if (!transcriptSupported) {
+        transcriptNote.textContent = 'Automatic transcription is unavailable here. You can type and edit notes below.';
+        transcriptEditor.value = transcriptEditor.value || 'Add your lecture notes here...';
+      } else if (!transcriptEditor.value.trim()) {
+        transcriptNote.textContent = 'No speech detected. You can type and edit notes below.';
+      } else {
+        transcriptNote.textContent = 'Transcript ready to edit.';
+      }
+    }
+
+    setupRecognition();
+
+    function syncUi() {
+      if (!tracedCount) {
+        progressChip.textContent = 'Free Trace';
+        statusText.textContent = 'Tap any dot to start tracing.';
+      } else if (tracedCount < dots.length) {
+        progressChip.textContent = `${tracedCount} Dots Traced`;
+        statusText.textContent = 'Keep tapping any dots that feel good to trace.';
+      } else {
+        progressChip.textContent = 'Orange complete';
+        statusText.textContent = 'Nice. You traced the full shape and can keep going or reset.';
+      }
+    }
+
+    function resetGame() {
+      points = [];
+      tracedCount = 0;
+      drawnLine.setAttribute('points', '');
+      dots.forEach((dot) => {
+        dot.classList.remove('completed');
+      });
+      syncUi();
+    }
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        if (dot.classList.contains('completed')) {
+          statusText.textContent = 'Pick any other dot to keep the line moving.';
+          return;
+        }
+
+        dot.classList.add('completed');
+        points.push(`${dot.getAttribute('cx')},${dot.getAttribute('cy')}`);
+        drawnLine.setAttribute('points', points.join(' '));
+        tracedCount += 1;
+        syncUi();
+      });
+    });
+
+    recordBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert('Your browser does not support audio recording.');
+          return;
+        }
+
+        try {
+          activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(activeStream);
+          recordedChunks = [];
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data && event.data.size > 0) {
+              recordedChunks.push(event.data);
+            }
+          };
+
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+
+            audioPreview.src = url;
+            audioPreview.classList.add('show');
+            recordingStatus.textContent = 'Recording saved. You can play it below.';
+            recordBtn.textContent = 'Start Recording';
+
+            if (activeStream) {
+              activeStream.getTracks().forEach(track => track.stop());
+              activeStream = null;
+            }
+
+            isRecording = false;
+            finishTranscriptCapture();
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = 'citrus_crush_recording.webm';
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recordBtn.textContent = 'Stop Recording';
+          recordingStatus.textContent = 'Recording... Tap again to stop.';
+          audioPreview.classList.remove('show');
+          audioPreview.removeAttribute('src');
+          audioPreview.load();
+          startTranscriptCapture();
+        } catch (err) {
+          console.error('Error starting recording:', err);
+          alert('Could not start recording. Please allow microphone access.');
+        }
+      } else if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    });
+
+    resetBtn.addEventListener('click', resetGame);
+    resetGame();
+  </script>
+</body>
+</html>

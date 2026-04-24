@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CapyPal — Study Spaces</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="app-frame">
+        <header class="header_home">
+          <div class="left">
+            <img src="CapyPal-Adhd-app_capy_icon.png" alt="capy" class="app-icon">
+            <div class="title">Study Spaces</div>
+          </div>
+          <div class="right">Profile</div>
+        </header>
+
+        <nav class="top-nav">
+          <a href="home.html" class="nav-item nav-home">Home</a>
+          <button class="nav-item nav-profile">Profile</button>
+        </nav>
+
+        <main class="home-main">
+          <section class="card plan-card">
+            <div class="plan-top">
+              <div class="plan-title">Find a study space</div>
+              <div class="plan-sub">Choose a campus or add a new one to see available spaces.</div>
+            </div>
+
+            <div class="combo-container">
+              <div class="combo-row">
+                <div class="combo">
+                  <input id="campusInput" class="combo-input" placeholder="Type or select a campus" aria-label="Campus input">
+                  <button id="toggleList" class="btn outline" title="Show campuses">▾</button>
+                </div>
+                <button id="addCampusBtn" class="btn primary">Add</button>
+              </div>
+              <ul id="suggestions" class="combo-list" role="listbox" aria-label="Campus suggestions"></ul>
+            </div>
+
+            <div id="campusContainer" class="campus-grid">
+              <!-- campus cards inserted here -->
+            </div>
+
+            <div id="spaceModal" class="space-modal hidden" role="dialog" aria-modal="true">
+              <div class="space-modal-card">
+                <button type="button" class="space-modal-close" id="spaceModalClose"></button>
+                <img id="spaceModalImage" src="BIT_space.JPG" alt="Study space" class="space-modal-image" />
+                <div class="space-modal-content">
+                  <div class="space-modal-title" id="spaceModalTitle">Study Space</div>
+                  <div class="space-modal-hours" id="spaceModalHours">Hours: 8am - 10pm</div>
+                  <p class="space-modal-desc" id="spaceModalDesc">Explore the space and see available study hours.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      (function(){
+        // fixed campus cards with images and long labels per request
+        let campuses = [
+          { img: 'BIT.jpg', name: '3rd floor BIT', subtitle: 'Business and Information Technology Building', spaceImage: 'BIT_space.JPG', hours: 'Mon-Thu 8AM-10PM Fri 8AM-5PM Sat 10:30AM - 2:30PM Sun 2PM-6PM', status: 'Semi-Quiet Floor', description: 'Directions: Go to the elevator' },
+          { img: 'CAHSS.JPG', name: 'CAHSS', subtitle: 'College of Arts, Humanities, and Social Sciences', spaceImage: 'CAHSS.JPG', hours: 'Mon- Fri 8AM-5PM', description: 'Semi-Quiet Space' },
+          { img: 'Library(CSUMB).jpg', name: 'Library', subtitle: 'Tanimura and Antle Family Memorial Library', spaceImage: 'Library(CSUMB).jpg', status: '1rst and 2nd (Floor Talkative Floor) 3rd Floor (Quiet Floor)',hours: 'Mon-Thu 8AM-11PM Fri 8AM-5PM Sat 10AM - 5PM', description: 'Book Rooms: https://csumb.bookedscheduler.com/Web/' },
+          { img: 'Student-Center.jpg', name: 'Building 12', subtitle: 'Student Center', spaceImage: 'StudentCenter_space.JPG', hours: '8AM - 5PM', description: 'Semi-Quiet Space' },
+          { img: 'OE.jpeg', name: 'Otter Express', spaceImage: 'OE_space.JPG', hours: '11AM - 10PM', subtitle: 'Loud Space' }
+        ];
+
+        const input = document.getElementById('campusInput');
+        const suggestions = document.getElementById('suggestions');
+        const toggle = document.getElementById('toggleList');
+        const addBtn = document.getElementById('addCampusBtn');
+        const container = document.getElementById('campusContainer');
+
+        function renderSuggestions(filter){
+          suggestions.innerHTML='';
+          const list = campuses.filter(c=>!filter || c.name.toLowerCase().includes(filter.toLowerCase()));
+          if(list.length===0){
+            const li = document.createElement('li'); li.className='combo-item disabled'; li.textContent='No matches'; suggestions.appendChild(li); return;
+          }
+          list.forEach(c=>{
+            const li = document.createElement('li'); li.className='combo-item'; li.tabIndex=0; li.textContent=c.name;
+            li.addEventListener('click', ()=>{ selectCampus(c.name); });
+            li.addEventListener('keydown', (e)=>{ if(e.key==='Enter') selectCampus(c.name); });
+            suggestions.appendChild(li);
+          });
+        }
+
+        function renderCampuses(){
+          container.innerHTML='';
+          campuses.forEach(c=>{
+            const card = document.createElement('div'); card.className='campus-card';
+            if(c.img){
+              const im = document.createElement('img'); im.src = c.img; im.alt = c.name; im.className='campus-img'; card.appendChild(im);
+            }
+            const title = document.createElement('div'); title.className='campus-title'; title.textContent=c.name;
+            const desc = document.createElement('div'); desc.className='campus-desc'; desc.textContent=c.subtitle || 'Tap to view study spaces';
+            card.appendChild(title); card.appendChild(desc);
+            card.addEventListener('click', ()=> showSpaceModal(c));
+            container.appendChild(card);
+          });
+        }
+
+        function selectCampus(name){
+          input.value = name;
+          suggestions.innerHTML='';
+          renderCampuses();
+        }
+
+        function addCampus(){
+          const v = input.value.trim(); if(!v) return;
+          // allow adding simple text campuses (no image)
+          if(!campuses.find(x=>x.name.toLowerCase()===v.toLowerCase())) campuses.unshift({img:null,name:v,subtitle:''});
+          sessionStorage.setItem('studyspaces_custom', JSON.stringify(campuses));
+          input.value=''; renderSuggestions(); renderCampuses();
+        }
+
+        input.addEventListener('input', ()=>{ renderSuggestions(input.value); });
+        input.addEventListener('focus', ()=>{ renderSuggestions(input.value); });
+        toggle.addEventListener('click', ()=>{ if(suggestions.children.length) suggestions.innerHTML=''; else renderSuggestions(); });
+        addBtn.addEventListener('click', addCampus);
+        input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addCampus(); } });
+
+        // initial render
+        // try to load any saved campuses (custom items) first
+        try{
+          const saved = JSON.parse(sessionStorage.getItem('studyspaces_custom'));
+          if(Array.isArray(saved) && saved.length) campuses = saved.concat(campuses.filter(c=>!saved.find(s=>s.name===c.name)));
+        }catch(e){}
+
+        const spaceModal = document.getElementById('spaceModal');
+        const spaceModalClose = document.getElementById('spaceModalClose');
+        const spaceModalImage = document.getElementById('spaceModalImage');
+        const spaceModalTitle = document.getElementById('spaceModalTitle');
+        const spaceModalHours = document.getElementById('spaceModalHours');
+        const spaceModalDesc = document.getElementById('spaceModalDesc');
+
+        function showSpaceModal(campus) {
+          spaceModalImage.src = campus.spaceImage || campus.img || 'BIT_space.JPG';
+          spaceModalTitle.textContent = campus.name;
+          spaceModalHours.textContent = `Hours: ${campus.hours || 'N/A'}`;
+          spaceModalDesc.textContent = campus.description || campus.subtitle || 'View this space details.';
+          spaceModal.classList.remove('hidden');
+        }
+
+        function closeSpaceModal() {
+          spaceModal.classList.add('hidden');
+        }
+
+        spaceModalClose.addEventListener('click', closeSpaceModal);
+        spaceModal.addEventListener('click', (e) => { if (e.target === spaceModal) closeSpaceModal(); });
+
+        renderSuggestions();
+        renderCampuses();
+      })();
+    </script>
+  </body>
+</html>

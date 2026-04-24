@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CapyPal — Music</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="app-frame">
+        <header class="header_home">
+          <div class="left">
+            <img src="CapyPal-Adhd-app_capy_icon.png" alt="capy" class="app-icon">
+            <a href="home.html" class="title">Music</a>
+          </div>
+          <div class="right">Profile</div>
+        </header>
+
+        <nav class="top-nav">
+          <a href="home.html" class="nav-item nav-home">Home</a>
+          <button class="nav-item nav-profile">Profile</button>
+        </nav>
+
+        <main class="home-main">
+          <section class="card plan-card">
+            <div class="plan-top">
+              <div class="plan-title">Notice</div>
+              <div class="plan-sub">Your screen will be locked while listening to music</div>
+            </div>
+
+            <div class="music-hero" style="display:flex;gap:12px;align-items:center;margin-top:12px;padding:10px;background:linear-gradient(135deg,#fff,#fff);border-radius:12px;">
+              <video id="previewVideo" class="music-preview" muted playsinline loop poster="zen_vibes_preview.jpg" style="width:120px;height:120px;object-fit:cover;border-radius:16px;background:#f3f4f6"></video>
+              <div>
+                <div style="font-weight:800">Zen and LoFi Music</div>
+                <div style="font-size:13px;color:#6b7280">Relax into a calm study flow with live video preview.</div>
+              </div>
+              <div style="margin-left:auto">
+                <button class="btn primary" id="playHero" data-track="zen">Play</button>
+              </div>
+            </div>
+
+        <div class="track-list" style="margin-top:12px;display:grid;gap:10px">
+          <div class="track card" data-title="Nature Sounds">
+            <div style="display:flex;gap:10px;align-items:center">
+              <img src="sauna_preview.jpg" style="width:64px;height:64px;border-radius:8px;object-fit:cover">
+              <div>
+                <div style="font-weight:800">Nature Sounds</div>
+                <div style="font-size:13px;color:#6b7280">A calming sauna ambience.</div>
+              </div>
+              <div style="margin-left:auto"><button class="btn primary play-btn" data-track="nature">Play</button></div>
+            </div>
+          </div>
+
+          <div class="track card" data-title="Jazz Music">
+            <div style="display:flex;gap:10px;align-items:center">
+              <img src="train_capy_preview.jpg" style="width:64px;height:64px;border-radius:8px;object-fit:cover">
+              <div>
+                <div style="font-weight:800">Jazz Music</div>
+                <div style="font-size:13px;color:#6b7280">Smooth train vibes to focus.</div>
+              </div>
+              <div style="margin-left:auto"><button class="btn primary play-btn" data-track="jazz">Play</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lock-overlay hidden" id="lockOverlay">
+          <div class="lock-panel">
+            <div class="lock-title">Listening...</div>
+            <div class="lock-sub">Your screen is locked until the music finishes.</div>
+            <div class="lock-spinner"></div>
+          </div>
+        </div>
+
+        <video id="zenTrack" src="zen_capy.mp4" preload="auto" style="display:none"></video>
+        <video id="natureTrack" src="nature_capy.mp4" preload="auto" style="display:none"></video>
+        <video id="jazzTrack" src="train_capy.mp4" preload="auto" style="display:none"></video>
+      </section>
+    </main>
+  </div>
+</div>
+
+    <script>
+      const trackButtons = document.querySelectorAll('.play-btn');
+      const heroButton = document.getElementById('playHero');
+      const previewVideo = document.getElementById('previewVideo');
+      const lockOverlay = document.getElementById('lockOverlay');
+      const tracks = {
+        zen: document.getElementById('zenTrack'),
+        nature: document.getElementById('natureTrack'),
+        jazz: document.getElementById('jazzTrack')
+      };
+      const previewSources = {
+        zen: 'zen_capy.mp4',
+        nature: 'nature_capy.mp4',
+        jazz: 'train_capy.mp4'
+      };
+      let activeTrack = null;
+
+      function lockScreen(label) {
+        lockOverlay.classList.remove('hidden');
+        lockOverlay.querySelector('.lock-title').textContent = `Listening to ${label}...`;
+        document.body.style.pointerEvents = 'none';
+        lockOverlay.style.pointerEvents = 'auto';
+      }
+
+      function unlockScreen() {
+        lockOverlay.classList.add('hidden');
+        document.body.style.pointerEvents = '';
+        document.querySelectorAll('.btn.primary').forEach(btn => btn.disabled = false);
+      }
+
+      function playTrack(trackKey, label, button) {
+        if (activeTrack) {
+          activeTrack.pause();
+          activeTrack.currentTime = 0;
+        }
+        Object.values(tracks).forEach(video => {
+          if (video !== tracks[trackKey]) {
+            video.pause();
+            video.currentTime = 0;
+          }
+        });
+        activeTrack = tracks[trackKey];
+        previewVideo.src = previewSources[trackKey];
+        previewVideo.load();
+        previewVideo.play().catch(() => {});
+        lockScreen(label);
+        document.querySelectorAll('.btn.primary').forEach(btn => btn.disabled = true);
+        button.textContent = 'Playing';
+        activeTrack.play().catch(() => {
+          unlockScreen();
+        });
+      }
+
+      Object.keys(tracks).forEach(key => {
+        tracks[key].addEventListener('ended', () => {
+          unlockScreen();
+          if (heroButton.dataset.track === key) heroButton.textContent = 'Play';
+          trackButtons.forEach(btn => {
+            if (btn.dataset.track === key) btn.textContent = 'Play';
+          });
+          activeTrack = null;
+        });
+      });
+
+      heroButton.addEventListener('click', () => {
+        if (heroButton.disabled) return;
+        playTrack('zen', 'Zen and LoFi Music', heroButton);
+      });
+
+      trackButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          if (button.disabled) return;
+          const trackKey = button.dataset.track;
+          const label = trackKey === 'nature' ? 'Nature Sounds' : 'Jazz Music';
+          playTrack(trackKey, label, button);
+        });
+      });
+    </script>
+  </body>
+</html>

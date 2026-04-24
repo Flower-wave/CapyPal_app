@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CapyPal — Plan</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="app-frame">
+        <header class="header_home">
+          <div class="left">
+            <img src="CapyPal-Adhd-app_capy_icon.png" alt="capy" class="app-icon">
+            <div class="title">Plan</div>
+          </div>
+          <div class="right">Profile</div>
+        </header>
+
+        <nav class="top-nav">
+          <a href="home.html" class="nav-item nav-home">Home</a>
+          <button class="nav-item nav-profile">Profile</button>
+        </nav>
+
+        <main class="home-main">
+          <section class="card plan-card">
+            <div class="plan-top">
+              <div class="plan-title">Your plan</div>
+              <div class="plan-sub">Create routines and small steps you can complete each day.</div>
+            </div>
+
+            <div class="calendar">
+              <div class="calendar-header">
+                <button id="prevMonth" class="btn outline">‹</button>
+                <div class="month-label" id="monthLabel">April 2026</div>
+                <button id="nextMonth" class="btn outline">›</button>
+              </div>
+              <div class="weekday-row">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+              </div>
+              <div class="calendar-grid" id="calendarGrid">
+                <!-- days injected here -->
+              </div>
+            </div>
+
+            <div class="day-plan card" id="dayPlan">
+              <div class="day-header">
+                <div id="selectedDateLabel">Select a day</div>
+              </div>
+              <ul id="dayTasks" class="task-list"></ul>
+              <div style="display:flex;gap:8px;margin-top:12px">
+                <input class="input" id="addTaskInput" placeholder="Add a task for selected day">
+                <button id="addTaskBtn" class="btn primary">Add</button>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      // Simple add-to-list behavior
+      document.addEventListener('DOMContentLoaded', ()=>{
+        const addBtn = document.getElementById('addPlanBtn');
+        const input = document.getElementById('newPlanInput');
+        const list = document.querySelector('.task-list');
+        if(addBtn){ addBtn.addEventListener('click', ()=>{
+          const v = input.value.trim(); if(!v) return; const li = document.createElement('li'); li.textContent = v; list.appendChild(li); input.value='';
+        }); }
+      });
+    </script>
+    <script>
+      // Calendar + per-day tasks (localStorage)
+      (function(){
+        const grid = document.getElementById('calendarGrid');
+        const monthLabel = document.getElementById('monthLabel');
+        const prev = document.getElementById('prevMonth');
+        const next = document.getElementById('nextMonth');
+        const selectedLabel = document.getElementById('selectedDateLabel');
+        const dayTasks = document.getElementById('dayTasks');
+        const addTaskInput = document.getElementById('addTaskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+
+        let view = new Date();
+        let selected = null;
+
+        function formatMonth(d){ return d.toLocaleString(undefined,{month:'long',year:'numeric'}); }
+        function keyForDate(d){ return d.toISOString().slice(0,10); }
+
+        function render(){
+          grid.innerHTML='';
+          const year = view.getFullYear();
+          const month = view.getMonth();
+          monthLabel.textContent = formatMonth(view);
+          const first = new Date(year,month,1);
+          const startDay = first.getDay();
+          const days = new Date(year,month+1,0).getDate();
+
+          for(let i=0;i<startDay;i++){
+            const cell = document.createElement('div'); cell.className='calendar-day inactive'; grid.appendChild(cell);
+          }
+          for(let d=1;d<=days;d++){
+            const cell = document.createElement('div'); cell.className='calendar-day';
+            const num = document.createElement('div'); num.className='date-num'; num.textContent=d; cell.appendChild(num);
+            cell.addEventListener('click', ()=> selectDay(new Date(year,month,d), cell));
+            grid.appendChild(cell);
+          }
+        }
+
+        function loadTasksFor(date){
+          const k = 'plan_' + keyForDate(date);
+          const raw = localStorage.getItem(k); return raw? JSON.parse(raw): [];
+        }
+        function saveTasksFor(date, tasks){ localStorage.setItem('plan_' + keyForDate(date), JSON.stringify(tasks)); }
+
+        function selectDay(date, cell){
+          selected = date; selectedLabel.textContent = date.toDateString();
+          Array.from(document.querySelectorAll('.calendar-day')).forEach(n=>n.classList.remove('selected'));
+          cell.classList.add('selected');
+          renderDayTasks();
+        }
+
+        function renderDayTasks(){
+          dayTasks.innerHTML = '';
+          if(!selected) return;
+          const tasks = loadTasksFor(selected);
+          tasks.forEach((t,i)=>{
+            const li = document.createElement('li'); li.textContent = t;
+            const del = document.createElement('button'); del.className='btn outline'; del.textContent='Delete'; del.style.marginLeft='8px'; del.addEventListener('click', ()=>{ tasks.splice(i,1); saveTasksFor(selected,tasks); renderDayTasks(); });
+            li.appendChild(del); dayTasks.appendChild(li);
+          });
+        }
+
+        addTaskBtn.addEventListener('click', ()=>{
+          if(!selected) return alert('Select a day first');
+          const v = addTaskInput.value.trim(); if(!v) return; const tasks = loadTasksFor(selected); tasks.push(v); saveTasksFor(selected,tasks); addTaskInput.value=''; renderDayTasks();
+        });
+
+        prev.addEventListener('click', ()=>{ view = new Date(view.getFullYear(), view.getMonth()-1,1); render(); });
+        next.addEventListener('click', ()=>{ view = new Date(view.getFullYear(), view.getMonth()+1,1); render(); });
+
+  // month shortcuts removed; prev/next buttons handle month navigation
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

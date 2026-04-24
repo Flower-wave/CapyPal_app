@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CapyPal — Recording</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .recording-results {
+        margin-top: 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .recording-audio {
+        display: none;
+        width: 100%;
+      }
+
+      .recording-audio.show {
+        display: block;
+      }
+
+      .transcript-card {
+        display: none;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .transcript-card.show {
+        display: grid;
+      }
+
+      .transcript-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .transcript-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #111827;
+      }
+
+      .transcript-note {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+      }
+
+      .transcript-editor {
+        width: 100%;
+        min-height: 180px;
+        resize: vertical;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 16px;
+        padding: 12px 14px;
+        font: inherit;
+        color: #111827;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="app-frame">
+        <header class="header_home">
+          <div class="left">
+            <img src="CapyPal-Adhd-app_capy_icon.png" alt="capy" class="app-icon">
+            <div class="title">Recording</div>
+          </div>
+          <div class="right">Profile</div>
+        </header>
+
+        <main class="home-main recording-main">
+          <section class="recording-card">
+            <div class="recording-bg">
+              <div class="recording-overlay">
+                <div class="recording-header">
+                  <div>
+                    <div class="recording-title">Capture your voice</div>
+                    <div class="recording-sub">Use this quick recording to save a study reminder or mood check-in.</div>
+                  </div>
+                  <a href="games.html" class="btn back-btn"><span class="back-arrow">←</span>Back</a>
+                </div>
+
+                <div class="recording-panel">
+                  <img src="cappy_cabybara.png" alt="Capy" class="recording-avatar">
+                  <div class="recording-status">
+                    <div class="status-label">Ready to record</div>
+                    <div class="status-note">Tap the button below and start speaking.</div>
+                  </div>
+                </div>
+
+                <div class="recording-action">
+                  <button class="btn primary record-btn-action" id="recordButton">Start Recording</button>
+                  <div class="recording-timer" id="recordTimer">00:00</div>
+                </div>
+
+                <div class="recording-results">
+                  <audio id="audioPreview" class="recording-audio" controls></audio>
+                  <section class="transcript-card" id="transcriptCard">
+                    <div class="transcript-head">
+                      <div class="transcript-title">Transcript</div>
+                      <div class="transcript-note" id="transcriptNote">Ready after recording</div>
+                    </div>
+                    <textarea id="transcriptEditor" class="transcript-editor" spellcheck="true"></textarea>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const recordButton = document.getElementById('recordButton');
+      const recordTimer = document.getElementById('recordTimer');
+      const audioPreview = document.getElementById('audioPreview');
+      const transcriptCard = document.getElementById('transcriptCard');
+      const transcriptNote = document.getElementById('transcriptNote');
+      const transcriptEditor = document.getElementById('transcriptEditor');
+      const statusLabel = document.querySelector('.status-label');
+      const statusNote = document.querySelector('.status-note');
+      let recordInterval;
+      let seconds = 0;
+      let isRecording = false;
+      let mediaRecorder = null;
+      let recordedChunks = [];
+      let activeStream = null;
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const transcriptSupported = Boolean(SpeechRecognition);
+      let recognition = null;
+      let transcriptFinal = '';
+
+      function updateTimer() {
+        seconds += 1;
+        const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        recordTimer.textContent = `${mins}:${secs}`;
+      }
+
+      function setupRecognition() {
+        if (!transcriptSupported) return;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        recognition.onresult = (event) => {
+          let interim = '';
+          for (let i = event.resultIndex; i < event.results.length; i += 1) {
+            const result = event.results[i];
+            const text = result[0].transcript;
+            if (result.isFinal) {
+              transcriptFinal += `${text} `;
+            } else {
+              interim += text;
+            }
+          }
+          transcriptEditor.value = `${transcriptFinal}${interim}`.trim();
+        };
+        recognition.onerror = () => {
+          transcriptNote.textContent = 'Transcription paused. You can still edit notes below.';
+        };
+      }
+
+      function startTranscriptCapture() {
+        transcriptFinal = '';
+        transcriptEditor.value = '';
+        transcriptCard.classList.remove('show');
+        transcriptNote.textContent = transcriptSupported ? 'Listening for speech...' : 'Type notes after recording';
+        if (recognition) {
+          try {
+            recognition.start();
+          } catch (err) {
+            console.error('Speech recognition start error:', err);
+          }
+        }
+      }
+
+      function finishTranscriptCapture() {
+        if (recognition) {
+          try {
+            recognition.stop();
+          } catch (err) {
+            console.error('Speech recognition stop error:', err);
+          }
+        }
+        transcriptCard.classList.add('show');
+        if (!transcriptSupported) {
+          transcriptNote.textContent = 'Automatic transcription is unavailable here. You can type and edit notes below.';
+          transcriptEditor.value = transcriptEditor.value || 'Add your lecture notes here...';
+        } else if (!transcriptEditor.value.trim()) {
+          transcriptNote.textContent = 'No speech detected. You can type and edit notes below.';
+        } else {
+          transcriptNote.textContent = 'Transcript ready to edit.';
+        }
+      }
+
+      setupRecognition();
+
+      recordButton.addEventListener('click', async () => {
+        if (!isRecording) {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('Your browser does not support audio recording.');
+            return;
+          }
+
+          try {
+            activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(activeStream);
+            recordedChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+              if (event.data && event.data.size > 0) {
+                recordedChunks.push(event.data);
+              }
+            };
+
+            mediaRecorder.onstop = () => {
+              const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+              const url = URL.createObjectURL(blob);
+
+              audioPreview.src = url;
+              audioPreview.classList.add('show');
+              statusLabel.textContent = 'Recording complete';
+              statusNote.textContent = 'You can replay the audio and edit the transcript below.';
+              recordButton.textContent = 'Start Recording';
+              recordButton.classList.remove('recording-active');
+
+              if (activeStream) {
+                activeStream.getTracks().forEach((track) => track.stop());
+                activeStream = null;
+              }
+
+              isRecording = false;
+              finishTranscriptCapture();
+
+              const downloadLink = document.createElement('a');
+              downloadLink.href = url;
+              downloadLink.download = 'capypal_recording.webm';
+              downloadLink.style.display = 'none';
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            seconds = 0;
+            recordTimer.textContent = '00:00';
+            recordButton.textContent = 'Stop Recording';
+            recordInterval = setInterval(updateTimer, 1000);
+            recordButton.classList.add('recording-active');
+            statusLabel.textContent = 'Recording...';
+            statusNote.textContent = 'Tap the button again when you want to stop and transcribe.';
+            audioPreview.classList.remove('show');
+            audioPreview.removeAttribute('src');
+            audioPreview.load();
+            startTranscriptCapture();
+          } catch (err) {
+            console.error('Error starting recording:', err);
+            alert('Could not start recording. Please allow microphone access.');
+          }
+        } else {
+          clearInterval(recordInterval);
+          if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

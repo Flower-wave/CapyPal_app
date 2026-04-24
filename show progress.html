@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CapyPal — Progress</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <div class="app-frame">
+            <header class="header_home">
+                <div class="left">
+                    <img src="CapyPal-Adhd-app_capy_icon.png" alt="capy" class="app-icon">
+                    <div class="title">Progress</div>
+                </div>
+                <div class="right">
+                    <a href="closet.html" class="icon-link" title="Closet">👗</a>
+                </div>
+            </header>
+
+            <main class="home-main progress-main">
+                <section class="progress-card">
+                    <div class="progress-row">
+                        <a href="checkoncapy.html" class="btn back-btn"><span class="back-arrow">←</span>Back</a>
+                        <a href="closet.html" class="icon-link small">👗<span>Closet</span></a>
+                    </div>
+
+                    <div class="progress-top">
+                        <div class="progress-summary">
+                            <div class="page-title">Homework Progress</div>
+                            <p class="page-sub">Track your assignments, earn HP, and keep Capy feeling great.</p>
+                        </div>
+                        <img src="cappy_cabybara.png" alt="Capy" class="progress-avatar">
+                    </div>
+
+                    <div class="hp-card">
+                        <div class="hp-header">
+                            <div>
+                                <div class="stat-label">Capy HP</div>
+                                <div class="stat-value">78 / 100</div>
+                            </div>
+                            <div class="hp-badge">Good</div>
+                        </div>
+                        <div class="hp-bar-wrapper">
+                            <div class="hp-bar" style="width:78%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-grid">
+                        <div class="progress-item">
+                            <div class="item-label">Assignments done</div>
+                            <div class="item-value">6 / 8</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="item-label">Focus streak</div>
+                            <div class="item-value">3 days</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-actions">
+                        <a href="plan.html" class="btn primary">Open Plan</a>
+                        <div class="progress-note">Tap the button to review today's tasks and stay on track.</div>
+                    </div>
+
+                    <section class="share-card">
+                        <div class="share-header">
+                            <div>
+                                <div class="section-title">Share progress</div>
+                                <div class="share-sub">Invite people by email so your community can cheer you on.</div>
+                            </div>
+                        </div>
+                        <div class="share-input-row">
+                            <input id="shareEmail" type="email" placeholder="Enter email address" aria-label="Add email" />
+                            <button class="btn primary" id="shareAddBtn">Add</button>
+                        </div>
+                        <div class="share-list" id="shareList">
+                            <div class="share-empty">No teammates added yet.</div>
+                        </div>
+                    </section>
+                </section>
+
+                <section class="closet-preview">
+                    <div class="section-header">
+                        <div class="section-title">Closet</div>
+                        <a href="closet.html" class="link-text">Open Closet</a>
+                    </div>
+                    <div class="closet-list">
+                        <div class="closet-item">
+                            <img src="sunglasses.png" alt="Capy outfit">
+                            <strong>Sunglasses</strong>
+                            <small>Be cool and focused.</small>
+                        </div>
+                        <div class="closet-item">
+                            <img src="hoodie_outfit.png" alt="Capy outfit">
+                            <strong>Cozy Hoodie</strong>
+                            <small>Keep Capy comfy during assignments.</small>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script>
+      const shareEmail = document.getElementById('shareEmail');
+      const shareAddBtn = document.getElementById('shareAddBtn');
+      const shareList = document.getElementById('shareList');
+
+      function renderShareList() {
+        const emails = JSON.parse(sessionStorage.getItem('sharedEmails') || '[]');
+        shareList.innerHTML = '';
+        if (!emails.length) {
+          const empty = document.createElement('div');
+          empty.className = 'share-empty';
+          empty.textContent = 'No teammates added yet.';
+          shareList.appendChild(empty);
+          return;
+        }
+        emails.forEach(email => {
+          const item = document.createElement('div');
+          item.className = 'share-chip';
+          item.textContent = email;
+          shareList.appendChild(item);
+        });
+      }
+
+      function addShareEmail() {
+        const email = shareEmail.value.trim();
+        if (!email || !email.includes('@')) return;
+        const emails = JSON.parse(sessionStorage.getItem('sharedEmails') || '[]');
+        if (!emails.includes(email)) {
+          emails.push(email);
+          sessionStorage.setItem('sharedEmails', JSON.stringify(emails));
+        }
+        shareEmail.value = '';
+        renderShareList();
+      }
+
+      shareAddBtn.addEventListener('click', addShareEmail);
+      shareEmail.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addShareEmail();
+        }
+      });
+      renderShareList();
+    </script>
+</body>
+</html>

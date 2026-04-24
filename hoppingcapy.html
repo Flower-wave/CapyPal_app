@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CapyPal — Hopping Capy</title>
+  <style>
+    :root {
+      --bg: #f7efe5;
+      --card: #fffaf4;
+      --surface: #ffffff;
+      --text: #3d2b1f;
+      --muted: #7e6b5f;
+      --accent: #f5a623;
+      --accent-dark: #dc8d12;
+      --nav-bg: #f2dfcb;
+      --shadow: 0 10px 30px rgba(91, 62, 34, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f8efe6 0%, #f2e4d4 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 375px;
+    }
+
+    .app-frame {
+      background: var(--card);
+      width: 375px;
+      min-height: 812px;
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid rgba(125, 92, 57, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header_home {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: transparent;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .app-icon {
+      width: 46px;
+      height: 46px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #fff;
+      padding: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .title {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .right {
+      background: #fff;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .top-nav {
+      display: flex;
+      gap: 8px;
+      justify-content: space-around;
+      padding: 8px 12px 10px;
+      border-bottom: 1px solid rgba(125, 92, 57, 0.08);
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .nav-item:hover {
+      transform: translateY(-1px);
+    }
+
+    .nav-home {
+      background: rgba(255, 255, 255, 0.45);
+      color: var(--text);
+    }
+
+    .home-main {
+      padding: 12px 12px 18px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 30px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+      min-height: 100%;
+    }
+
+    .game-card {
+      display: grid;
+      gap: 16px;
+    }
+
+    .game-area {
+      position: relative;
+      height: 430px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #e8f4ff;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .game-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .sky-text {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      width: 72%;
+      max-width: 240px;
+      transform: translateX(-50%);
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .capy {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      width: 128px;
+      transform: translateX(-50%);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.18s ease;
+      transform-origin: center bottom;
+    }
+
+    .capy:hover {
+      transform: translateX(-50%) scale(1.02);
+    }
+
+    .capy.hop {
+      animation: hop 0.6s ease;
+    }
+
+    @keyframes hop {
+      0%   { transform: translateX(-50%) translateY(0) scale(1); }
+      20%  { transform: translateX(-50%) translateY(-35px) scale(1.03); }
+      45%  { transform: translateX(-50%) translateY(-85px) scale(1.06); }
+      70%  { transform: translateX(-50%) translateY(-25px) scale(0.99); }
+      100% { transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    .game-controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 18px;
+      padding: 13px 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      background: var(--accent);
+      color: #000;
+    }
+
+    .back-link:hover {
+      background: var(--accent-dark);
+      color: #000;
+    }
+
+    .recording-status {
+      background: #f8f2eb;
+      color: var(--muted);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+    }
+
+    .audio-preview {
+      display: none;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .audio-preview.show {
+      display: block;
+    }
+
+    .transcript-card {
+      display: none;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 20px;
+      background: #fff7ee;
+      border: 1px solid rgba(220, 141, 18, 0.18);
+    }
+
+    .transcript-card.show {
+      display: grid;
+    }
+
+    .transcript-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .transcript-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .transcript-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .transcript-editor {
+      width: 100%;
+      min-height: 150px;
+      resize: vertical;
+      border: 1px solid rgba(125, 92, 57, 0.16);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 10px;
+      }
+
+      .app-frame {
+        width: 100%;
+        min-height: auto;
+      }
+
+      .game-area {
+        height: 360px;
+      }
+
+      .capy {
+        width: 112px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="app-frame">
+      <header class="header_home">
+        <div class="left">
+          <img src="CapyPal-Adhd-app_capy_icon.png" alt="CapyPal icon" class="app-icon">
+          <a href="home.html" class="title">Hopping Capy</a>
+        </div>
+        <div class="right">Profile</div>
+      </header>
+
+      <nav class="top-nav" aria-label="Main navigation">
+        <a href="home.html" class="nav-item nav-home">Home</a>
+        <button class="nav-item nav-profile" type="button">Profile</button>
+      </nav>
+
+      <main class="home-main">
+        <section class="card game-card">
+          <div class="game-area" id="gameArea">
+            <img src="hoppingcapy_background.jpg" alt="Hopping Capy background" class="game-bg">
+            <img src="hoppingcapy_text.png" alt="Hopping Capy title" class="sky-text">
+            <img src="capy_hopping.png" alt="Hopping capy" id="capy" class="capy">
+          </div>
+
+          <div class="game-controls">
+            <button class="btn primary" id="recordBtn" type="button">Start Recording</button>
+            <div class="recording-status" id="recordingStatus">Not recording</div>
+            <audio id="audioPreview" class="audio-preview" controls></audio>
+            <section class="transcript-card" id="transcriptCard">
+              <div class="transcript-head">
+                <div class="transcript-title">Transcript</div>
+                <div class="transcript-note" id="transcriptNote">Ready after recording</div>
+              </div>
+              <textarea id="transcriptEditor" class="transcript-editor" spellcheck="true"></textarea>
+            </section>
+            <a href="games.html" class="btn back-link">More Games</a>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const capy = document.getElementById('capy');
+    const recordBtn = document.getElementById('recordBtn');
+    const recordingStatus = document.getElementById('recordingStatus');
+    const audioPreview = document.getElementById('audioPreview');
+    const transcriptCard = document.getElementById('transcriptCard');
+    const transcriptNote = document.getElementById('transcriptNote');
+    const transcriptEditor = document.getElementById('transcriptEditor');
+
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let activeStream = null;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const transcriptSupported = Boolean(SpeechRecognition);
+    let recognition = null;
+    let transcriptFinal = '';
+
+    function setupRecognition() {
+      if (!transcriptSupported) return;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      recognition.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const result = event.results[i];
+          const text = result[0].transcript;
+          if (result.isFinal) {
+            transcriptFinal += `${text} `;
+          } else {
+            interim += text;
+          }
+        }
+        transcriptEditor.value = `${transcriptFinal}${interim}`.trim();
+      };
+      recognition.onerror = () => {
+        transcriptNote.textContent = 'Transcription paused. You can still edit notes below.';
+      };
+    }
+
+    function startTranscriptCapture() {
+      transcriptFinal = '';
+      transcriptEditor.value = '';
+      transcriptCard.classList.remove('show');
+      transcriptNote.textContent = transcriptSupported ? 'Listening for speech...' : 'Type notes after recording';
+      if (recognition) {
+        try {
+          recognition.start();
+        } catch (err) {
+          console.error('Speech recognition start error:', err);
+        }
+      }
+    }
+
+    function finishTranscriptCapture() {
+      if (recognition) {
+        try {
+          recognition.stop();
+        } catch (err) {
+          console.error('Speech recognition stop error:', err);
+        }
+      }
+      transcriptCard.classList.add('show');
+      if (!transcriptSupported) {
+        transcriptNote.textContent = 'Automatic transcription is unavailable here. You can type and edit notes below.';
+        transcriptEditor.value = transcriptEditor.value || 'Add your lecture notes here...';
+      } else if (!transcriptEditor.value.trim()) {
+        transcriptNote.textContent = 'No speech detected. You can type and edit notes below.';
+      } else {
+        transcriptNote.textContent = 'Transcript ready to edit.';
+      }
+    }
+
+    setupRecognition();
+
+    capy.addEventListener('click', () => {
+      capy.classList.remove('hop');
+      void capy.offsetWidth;
+      capy.classList.add('hop');
+    });
+
+    recordBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert('Your browser does not support audio recording.');
+          return;
+        }
+
+        try {
+          activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(activeStream);
+          recordedChunks = [];
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data && event.data.size > 0) {
+              recordedChunks.push(event.data);
+            }
+          };
+
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+
+            audioPreview.src = url;
+            audioPreview.classList.add('show');
+
+            recordingStatus.textContent = 'Recording saved. You can play it below.';
+            recordBtn.textContent = 'Start Recording';
+
+            if (activeStream) {
+              activeStream.getTracks().forEach(track => track.stop());
+              activeStream = null;
+            }
+
+            isRecording = false;
+            finishTranscriptCapture();
+
+            // Optional automatic download:
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = 'hopping_capy_recording.webm';
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recordBtn.textContent = 'Stop Recording';
+          recordingStatus.textContent = 'Recording... Tap again to stop.';
+          audioPreview.classList.remove('show');
+          audioPreview.removeAttribute('src');
+          audioPreview.load();
+          startTranscriptCapture();
+        } catch (err) {
+          console.error('Error starting recording:', err);
+          alert('Could not start recording. Please allow microphone access.');
+        }
+      } else {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

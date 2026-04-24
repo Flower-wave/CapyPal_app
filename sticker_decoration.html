@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CapyPal — Sticker Decoration</title>
+  <style>
+    :root {
+      --frame: #fff7f1;
+      --surface: rgba(255, 255, 255, 0.96);
+      --text: #3d2a22;
+      --muted: #7d665d;
+      --accent: #f3a23a;
+      --accent-dark: #db8612;
+      --shadow: 0 18px 40px rgba(93, 60, 33, 0.14);
+      --line: rgba(196, 146, 105, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      background: linear-gradient(180deg, #fbf3eb 0%, #f5e4d4 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 375px;
+    }
+
+    .app-frame {
+      width: 375px;
+      min-height: 812px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: 30px;
+      border: 1px solid rgba(171, 124, 82, 0.16);
+      box-shadow: var(--shadow);
+      background:
+        radial-gradient(circle at top left, rgba(255, 225, 196, 0.88), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(243, 162, 58, 0.18), transparent 38%),
+        var(--frame);
+    }
+
+    .header_home {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .app-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #fff;
+      padding: 4px;
+      box-shadow: 0 8px 18px rgba(64, 43, 17, 0.08);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .right {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--muted);
+      font-size: 15px;
+      box-shadow: 0 8px 18px rgba(64, 43, 17, 0.08);
+    }
+
+    .top-nav {
+      display: flex;
+      gap: 8px;
+      justify-content: space-around;
+      padding: 8px 12px 10px;
+      border-bottom: 1px solid rgba(125, 102, 93, 0.12);
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .nav-home {
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .home-main {
+      flex: 1;
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+      overflow: auto;
+    }
+
+    .hero-card,
+    .game-card,
+    .scene-card,
+    .tray-card {
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: 0 14px 30px rgba(96, 65, 33, 0.08);
+    }
+
+    .hero-card {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background:
+        radial-gradient(circle at top left, rgba(255, 223, 189, 0.7), transparent 40%),
+        rgba(255, 250, 246, 0.98);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #fff0dd;
+      color: #a45f14;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      margin: 10px 0 6px;
+      font-size: 26px;
+      line-height: 1.02;
+      font-weight: 900;
+    }
+
+    .hero-sub {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .hero-preview {
+      width: 88px;
+      height: 88px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      font-size: 42px;
+      background: linear-gradient(180deg, #fff2df 0%, #ffe0be 100%);
+      box-shadow: inset 0 0 0 1px rgba(219, 134, 18, 0.12);
+    }
+
+    .scene-card,
+    .tray-card,
+    .game-card {
+      padding: 16px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .section-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .scene-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .scene-option {
+      border: 1px solid rgba(196, 146, 105, 0.24);
+      border-radius: 22px;
+      padding: 10px 8px;
+      background: #fffaf5;
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .scene-option:hover {
+      transform: translateY(-1px);
+    }
+
+    .scene-option.active {
+      border-color: rgba(219, 134, 18, 0.5);
+      box-shadow: 0 12px 20px rgba(243, 162, 58, 0.14);
+      background: #fff4e8;
+    }
+
+    .scene-thumb {
+      width: 74px;
+      height: 74px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(196, 146, 105, 0.18);
+      background: #fff3e2;
+    }
+
+    .scene-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .scene-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .game-area {
+      position: relative;
+      height: 320px;
+      overflow: hidden;
+      border-radius: 26px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #dff1ff 0%, #f7e2d5 58%, #f2c4af 100%);
+    }
+
+    .scene-stage {
+      position: absolute;
+      inset: 0;
+    }
+
+    .scene-stage.sauna {
+      background: linear-gradient(180deg, #dff1ff 0%, #f7d9cf 58%, #f0bcaa 100%);
+    }
+
+    .scene-stage.zen {
+      background: linear-gradient(180deg, #ffe7c8 0%, #ffd5ab 52%, #d19059 100%);
+    }
+
+    .scene-stage.train {
+      background: linear-gradient(180deg, #dff8ff 0%, #d0f1d2 50%, #8fc57d 100%);
+    }
+
+    .scene-stage::before {
+      content: "";
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 34px;
+      height: 86px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: inset 0 0 0 1px rgba(196, 146, 105, 0.14);
+    }
+
+    .scene-stage::after {
+      content: "";
+      position: absolute;
+      width: 84px;
+      height: 110px;
+      right: 28px;
+      bottom: 34px;
+      border-radius: 24px 24px 16px 16px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: inset 0 0 0 1px rgba(196, 146, 105, 0.14);
+    }
+
+    .scene-banner {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #9a5b10;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      z-index: 3;
+      box-shadow: 0 10px 20px rgba(90, 63, 28, 0.08);
+    }
+
+    .decor-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+
+    .sticker {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      font-size: 28px;
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: 0 10px 16px rgba(80, 56, 31, 0.12);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sticker img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .empty-note {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      padding: 10px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      z-index: 3;
+    }
+
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .sticker-chip {
+      border: 1px solid rgba(196, 146, 105, 0.22);
+      border-radius: 18px;
+      background: #fffaf5;
+      padding: 12px 8px;
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .sticker-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .sticker-chip.active {
+      border-color: rgba(219, 134, 18, 0.46);
+      background: #fff0df;
+    }
+
+    .sticker-emoji {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .sticker-thumb {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .sticker-name {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 16px;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 800;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .btn.secondary {
+      background: #fff0df;
+      color: #9a5b10;
+    }
+
+    .btn.more-games {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn.more-games:hover {
+      background: var(--accent-dark);
+      color: #000;
+    }
+
+    .recording-status,
+    .hint-card {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: #fff4e8;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .audio-preview {
+      display: none;
+      width: 100%;
+      margin-top: 2px;
+    }
+
+    .audio-preview.show {
+      display: block;
+    }
+
+    .transcript-card {
+      display: none;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 20px;
+      background: #fff4e8;
+      border: 1px solid rgba(196, 146, 105, 0.22);
+    }
+
+    .transcript-card.show {
+      display: grid;
+    }
+
+    .transcript-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .transcript-title {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .transcript-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .transcript-editor {
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      border: 1px solid rgba(196, 146, 105, 0.22);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 10px;
+      }
+
+      .app-frame {
+        width: 100%;
+        min-height: auto;
+      }
+
+      .hero-card {
+        grid-template-columns: 1fr;
+      }
+
+      .scene-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .sticker-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="app-frame">
+      <header class="header_home">
+        <div class="left">
+          <img src="CapyPal-Adhd-app_capy_icon.png" alt="CapyPal icon" class="app-icon">
+          <a href="games.html" class="title">Sticker Decoration</a>
+        </div>
+        <div class="right">Profile</div>
+      </header>
+
+      <nav class="top-nav" aria-label="Main navigation">
+        <a href="home.html" class="nav-item nav-home">Home</a>
+        <a href="games.html" class="nav-item">Games</a>
+      </nav>
+
+      <main class="home-main">
+        <section class="hero-card">
+          <div>
+            <div class="eyebrow">Creative Focus</div>
+            <h1 class="hero-title">Go Decorate!</h1>
+            <p class="hero-sub">Click on the scene to decorate the space and add cute accessories.</p>
+          </div>
+          <div class="hero-preview">✨</div>
+        </section>
+
+        <section class="scene-card">
+          <div class="section-head">
+            <div class="section-title">Choose a Scene</div>
+            <div class="section-note">Grid view</div>
+          </div>
+          <div class="scene-grid" id="sceneGrid">
+            <button class="scene-option active" type="button" data-scene="sauna" aria-pressed="true">
+              <div class="scene-thumb"><img src="sauna_preview.jpg" alt="Sauna scene preview"></div>
+              <div class="scene-label">Sauna</div>
+            </button>
+            <button class="scene-option" type="button" data-scene="zen" aria-pressed="false">
+              <div class="scene-thumb"><img src="zen_vibes_preview.jpg" alt="Zen vibes scene preview"></div>
+              <div class="scene-label">Zen Vibes</div>
+            </button>
+            <button class="scene-option" type="button" data-scene="train" aria-pressed="false">
+              <div class="scene-thumb"><img src="train_capy_preview.jpg" alt="Train capy scene preview"></div>
+              <div class="scene-label">Train Capy</div>
+            </button>
+          </div>
+        </section>
+
+        <section class="game-card">
+          <div class="section-head">
+            <div class="section-title" id="sceneTitle">Sauna Scene</div>
+            <div class="section-note" id="selectedStickerLabel">Selected: Lamp</div>
+          </div>
+
+          <div class="game-area" id="gameArea">
+            <div class="scene-stage sauna" id="sceneStage"></div>
+            <div class="scene-banner">Tap the scene to place stickers</div>
+            <div class="decor-layer" id="decorLayer"></div>
+            <div class="empty-note" id="emptyNote">Pick a sticker below, then tap anywhere in the scene to decorate it.</div>
+          </div>
+        </section>
+
+        <section class="tray-card">
+          <div class="section-head">
+            <div class="section-title">Sticker Tray</div>
+            <div class="section-note">Tap to select</div>
+          </div>
+          <div class="sticker-grid" id="stickerGrid"></div>
+        </section>
+
+        <div class="controls">
+          <button class="btn primary" id="recordBtn" type="button">Start Recording</button>
+          <button class="btn primary" id="clearBtn" type="button">Clear Scene</button>
+        </div>
+
+        <div class="recording-status" id="recordingStatus">Not recording</div>
+        <section class="transcript-card" id="transcriptCard">
+          <div class="transcript-head">
+            <div class="transcript-title">Transcript</div>
+            <div class="transcript-note" id="transcriptNote">Ready after recording</div>
+          </div>
+          <textarea id="transcriptEditor" class="transcript-editor" spellcheck="true"></textarea>
+        </section>
+        <a href="games.html" class="btn secondary more-games">More Games</a>
+        <audio id="audioPreview" class="audio-preview" controls></audio>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const sceneGrid = document.getElementById('sceneGrid');
+    const sceneOptions = Array.from(sceneGrid.querySelectorAll('.scene-option'));
+    const stickerGrid = document.getElementById('stickerGrid');
+    const sceneStage = document.getElementById('sceneStage');
+    const sceneTitle = document.getElementById('sceneTitle');
+    const selectedStickerLabel = document.getElementById('selectedStickerLabel');
+    const gameArea = document.getElementById('gameArea');
+    const decorLayer = document.getElementById('decorLayer');
+    const emptyNote = document.getElementById('emptyNote');
+    const clearBtn = document.getElementById('clearBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const recordingStatus = document.getElementById('recordingStatus');
+    const transcriptCard = document.getElementById('transcriptCard');
+    const transcriptNote = document.getElementById('transcriptNote');
+    const transcriptEditor = document.getElementById('transcriptEditor');
+    const audioPreview = document.getElementById('audioPreview');
+
+    const stickerSets = {
+      sauna: [
+        { label: 'Sauna Capy', src: 'sauna_sticker_capy.png' },
+        { label: 'Sauna Decor', src: 'sauna_decoration.png' },
+        { label: 'Orange Sauna', src: 'orange_sauna.png' }
+      ],
+      zen: [
+        { label: 'Zen Pad', src: 'zen_vibes_pad.png' },
+        { label: 'Zen Table', src: 'zen_vibes_table.png' },
+        { label: 'Zen Capy', src: 'zen_capy_body.png' },
+        { label: 'Books', src: 'books.png' }
+      ],
+      train: [
+        { label: 'Train Body', src: 'train_capy_body.png' },
+        { label: 'Orange Plush', src: 'train_capy_orangeplush.png' },
+        { label: 'Tumblr', src: 'train_capy_tumblr.png' },
+        { label: 'Backpack', src: 'train_capy_backpack.png' }
+      ]
+    };
+
+    let activeScene = 'sauna';
+    let activeSticker = stickerSets.sauna[0];
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let activeStream = null;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const transcriptSupported = Boolean(SpeechRecognition);
+    let recognition = null;
+    let transcriptFinal = '';
+
+    function setupRecognition() {
+      if (!transcriptSupported) return;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      recognition.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const result = event.results[i];
+          const text = result[0].transcript;
+          if (result.isFinal) {
+            transcriptFinal += `${text} `;
+          } else {
+            interim += text;
+          }
+        }
+        transcriptEditor.value = `${transcriptFinal}${interim}`.trim();
+      };
+      recognition.onerror = () => {
+        transcriptNote.textContent = 'Transcription paused. You can still edit notes below.';
+      };
+    }
+
+    function startTranscriptCapture() {
+      transcriptFinal = '';
+      transcriptEditor.value = '';
+      transcriptCard.classList.remove('show');
+      transcriptNote.textContent = transcriptSupported ? 'Listening for speech...' : 'Type notes after recording';
+      if (recognition) {
+        try {
+          recognition.start();
+        } catch (err) {
+          console.error('Speech recognition start error:', err);
+        }
+      }
+    }
+
+    function finishTranscriptCapture() {
+      if (recognition) {
+        try {
+          recognition.stop();
+        } catch (err) {
+          console.error('Speech recognition stop error:', err);
+        }
+      }
+      transcriptCard.classList.add('show');
+      if (!transcriptSupported) {
+        transcriptNote.textContent = 'Automatic transcription is unavailable here. You can type and edit notes below.';
+        transcriptEditor.value = transcriptEditor.value || 'Add your lecture notes here...';
+      } else if (!transcriptEditor.value.trim()) {
+        transcriptNote.textContent = 'No speech detected. You can type and edit notes below.';
+      } else {
+        transcriptNote.textContent = 'Transcript ready to edit.';
+      }
+    }
+
+    setupRecognition();
+
+    function renderStickerGrid(scene) {
+      const stickers = stickerSets[scene] || [];
+      stickerGrid.innerHTML = stickers.map((sticker, index) => `
+        <button class="sticker-chip${index === 0 ? ' active' : ''}" type="button" data-label="${sticker.label}"${sticker.emoji ? ` data-emoji="${sticker.emoji}"` : ''}${sticker.src ? ` data-src="${sticker.src}"` : ''}>
+          ${sticker.src ? `<img src="${sticker.src}" alt="${sticker.label}" class="sticker-thumb">` : `<div class="sticker-emoji">${sticker.emoji}</div>`}
+          <div class="sticker-name">${sticker.label}</div>
+        </button>
+      `).join('');
+
+      const stickerChips = Array.from(stickerGrid.querySelectorAll('.sticker-chip'));
+      stickerChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          stickerChips.forEach((item) => item.classList.toggle('active', item === chip));
+          updateSticker({
+            label: chip.dataset.label,
+            emoji: chip.dataset.emoji,
+            src: chip.dataset.src
+          });
+        });
+      });
+    }
+
+    function updateScene(scene) {
+      activeScene = scene;
+      sceneStage.className = `scene-stage ${scene}`;
+      sceneTitle.textContent = `${scene.charAt(0).toUpperCase() + scene.slice(1)} Scene`;
+      decorLayer.innerHTML = '';
+      renderStickerGrid(scene);
+      activeSticker = stickerSets[scene][0];
+      selectedStickerLabel.textContent = `Selected: ${activeSticker.label}`;
+      emptyNote.textContent = `Decorating the ${scene} scene. Tap anywhere to place ${activeSticker.label.toLowerCase()} stickers.`;
+    }
+
+    function updateSticker(sticker) {
+      activeSticker = sticker;
+      selectedStickerLabel.textContent = `Selected: ${sticker.label}`;
+      emptyNote.textContent = `Tap anywhere in the ${activeScene} scene to place ${sticker.label.toLowerCase()} stickers.`;
+    }
+
+    sceneOptions.forEach((option) => {
+      option.addEventListener('click', () => {
+        sceneOptions.forEach((item) => {
+          const active = item === option;
+          item.classList.toggle('active', active);
+          item.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        updateScene(option.dataset.scene);
+      });
+    });
+
+    gameArea.addEventListener('click', (event) => {
+      if (event.target.closest('.scene-banner') || event.target.closest('.empty-note') || event.target.closest('.sticker')) {
+        return;
+      }
+
+      const rect = decorLayer.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      const sticker = document.createElement('button');
+      sticker.type = 'button';
+      sticker.className = 'sticker';
+      if (activeSticker.src) {
+        const stickerImage = document.createElement('img');
+        stickerImage.src = activeSticker.src;
+        stickerImage.alt = activeSticker.label;
+        sticker.appendChild(stickerImage);
+      } else {
+        sticker.textContent = activeSticker.emoji;
+      }
+      sticker.style.left = `${Math.max(8, Math.min(rect.width - 62, x - 27))}px`;
+      sticker.style.top = `${Math.max(50, Math.min(rect.height - 62, y - 27))}px`;
+      sticker.title = `Remove ${activeSticker.label}`;
+      sticker.addEventListener('click', () => {
+        sticker.remove();
+        if (!decorLayer.children.length) {
+          emptyNote.textContent = `Tap anywhere in the ${activeScene} scene to place ${activeSticker.label.toLowerCase()} stickers.`;
+        }
+      });
+
+      decorLayer.appendChild(sticker);
+      emptyNote.textContent = `${decorLayer.children.length} sticker${decorLayer.children.length === 1 ? '' : 's'} placed in the ${activeScene} scene.`;
+    });
+
+    clearBtn.addEventListener('click', () => {
+      decorLayer.innerHTML = '';
+      emptyNote.textContent = `Tap anywhere in the ${activeScene} scene to place ${activeSticker.label.toLowerCase()} stickers.`;
+    });
+
+    recordBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert('Your browser does not support audio recording.');
+          return;
+        }
+
+        try {
+          activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(activeStream);
+          recordedChunks = [];
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data && event.data.size > 0) {
+              recordedChunks.push(event.data);
+            }
+          };
+
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+
+            audioPreview.src = url;
+            audioPreview.classList.add('show');
+            recordingStatus.textContent = 'Recording saved. You can play it below.';
+            recordBtn.textContent = 'Start Recording';
+
+            if (activeStream) {
+              activeStream.getTracks().forEach((track) => track.stop());
+              activeStream = null;
+            }
+
+            isRecording = false;
+            finishTranscriptCapture();
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = 'sticker_decoration_recording.webm';
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recordBtn.textContent = 'Stop Recording';
+          recordingStatus.textContent = 'Recording... Tap again to stop.';
+          audioPreview.classList.remove('show');
+          audioPreview.removeAttribute('src');
+          audioPreview.load();
+          startTranscriptCapture();
+        } catch (err) {
+          console.error('Error starting recording:', err);
+          alert('Could not start recording. Please allow microphone access.');
+        }
+      } else if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    });
+
+    updateScene(activeScene);
+    updateSticker(activeSticker);
+  </script>
+</body>
+</html>

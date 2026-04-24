@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CapyPal — Check In</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="app-frame">
+        <header class="header_home">
+          <div class="left">
+            <img src="CapyPal-Adhd-app_capy_icon.png" alt="capy" class="app-icon">
+            <div class="title">Check In</div>
+          </div>
+          <div class="right">Profile</div>
+        </header>
+
+        <main class="home-main checkin-main">
+          <section class="checkin-card">
+            <div class="checkin-top">
+              <div class="checkin-title">Daily Check‑In</div>
+              <div class="checkin-sub">Share how you're feeling right now. Capy will remember it and support you with a quick routine.</div>
+              <div class="outfit-preview">
+                <img src="cappy_cabybara.png" alt="Hoodie outfit" class="checkin-outfit">
+                <div>
+                  <div class="outfit-label">Capy</div>
+                  <div class="outfit-note">Capy is ready to check in.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-block">
+              <div class="section-label">How are you feeling?</div>
+              <div class="mood-grid">
+                <button type="button" class="mood-option">😊<span>Happy</span></button>
+                <button type="button" class="mood-option">🙂<span>Okay</span></button>
+                <button type="button" class="mood-option">😕<span>Stressed</span></button>
+                <button type="button" class="mood-option">😢<span>Low</span></button>
+                <button type="button" class="mood-option">😴<span>Tired</span></button>
+              </div>
+            </div>
+
+            <div class="section-block">
+              <div class="section-label">What’s on your mind?</div>
+              <textarea class="checkin-notes" placeholder="Write a quick note for Capy..."></textarea>
+            </div>
+
+            <div class="section-block">
+              <div class="section-label">Need a quick reset?</div>
+              <div class="quick-actions">
+                <button type="button" class="quick-pill" data-action="Focus">Focus</button>
+                <button type="button" class="quick-pill" data-action="Breathe">Breathe</button>
+                <button type="button" class="quick-pill" data-action="Take a break">Take a break</button>
+              </div>
+            </div>
+
+            <div class="duration-panel hidden" id="durationPanel">
+              <div class="section-label">Choose how long</div>
+              <div class="duration-controls">
+                <label class="duration-row">hrs
+                  <input type="number" min="0" max="12" value="0" id="durationHours">
+                </label>
+                <label class="duration-row">mins
+                  <input type="number" min="0" max="59" value="10" id="durationMinutes">
+                </label>
+                <label class="duration-row">secs
+                  <input type="number" min="0" max="59" value="0" id="durationSeconds">
+                </label>
+              </div>
+              <div class="selected-details">Selected: <span id="selectedActionText">Focus</span> for <span id="selectedDurationText">0h 10m 0s</span></div>
+            </div>
+            <div style="padding:12px;">
+
+              <a href="checkoncapy.html" class="btn back-btn"><span class="back-arrow">←</span>Back</a>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script>
+      const quickPills = document.querySelectorAll('.quick-pill');
+      const durationPanel = document.getElementById('durationPanel');
+      const selectedActionText = document.getElementById('selectedActionText');
+      const selectedDurationText = document.getElementById('selectedDurationText');
+      const durationInputs = [
+        document.getElementById('durationHours'),
+        document.getElementById('durationMinutes'),
+        document.getElementById('durationSeconds')
+      ];
+
+      function updateDurationText() {
+        const hours = durationInputs[0].value.padStart(1, '0');
+        const mins = durationInputs[1].value.padStart(1, '0');
+        const secs = durationInputs[2].value.padStart(1, '0');
+        selectedDurationText.textContent = `${hours}h ${mins}m ${secs}s`;
+      }
+
+      quickPills.forEach(btn => {
+        btn.addEventListener('click', () => {
+          quickPills.forEach(item => item.classList.remove('active'));
+          btn.classList.add('active');
+          selectedActionText.textContent = btn.dataset.action;
+          if (!durationPanel.classList.contains('hidden')) {
+            updateDurationText();
+          }
+          durationPanel.classList.remove('hidden');
+        });
+      });
+
+      durationInputs.forEach(input => {
+        input.addEventListener('input', () => {
+          if (durationPanel.classList.contains('hidden')) return;
+          updateDurationText();
+        });
+      });
+
+      updateDurationText();
+    </script>
+  </body>
+</html>
